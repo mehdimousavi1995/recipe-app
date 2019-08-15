@@ -7,6 +7,7 @@ import guru.springframework.recipe.domain.Recipe;
 import guru.springframework.recipe.repositories.RecipeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -34,11 +35,12 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    public Recipe findById(Long id) {
-        Optional<Recipe> optRecipe = recipeRepository.findById(id);
-        if(optRecipe.isPresent()) {
-            return optRecipe.get();
-        } else throw new RuntimeException("Recipe Not Found!");
+    public Recipe findById(Long l) {
+        Optional<Recipe> optRecipe = recipeRepository.findById(l);
+        if (!optRecipe.isPresent()) {
+            throw new RuntimeException("Recipe Not Found!");
+        }
+        return optRecipe.get();
     }
 
     @Override
@@ -46,6 +48,12 @@ public class RecipeServiceImpl implements RecipeService {
         Recipe recipe = recipeRepository.save(recipeCommandToRecipe.convert(command));
         log.debug("Saved RecipeId: ", recipe.getId());
         return recipeToRecipeCommand.convert(recipe);
+    }
+
+    @Transactional
+    @Override
+    public RecipeCommand findCommandById(Long l) {
+        return recipeToRecipeCommand.convert(findById(l));
     }
 
 
