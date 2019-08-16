@@ -1,6 +1,8 @@
 package guru.springframework.recipe.controllers;
 
+import guru.springframework.recipe.commands.IngredientCommand;
 import guru.springframework.recipe.commands.RecipeCommand;
+import guru.springframework.recipe.services.IngredientService;
 import guru.springframework.recipe.services.RecipeService;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,16 +21,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class IngredientControllerTest {
 
     @Mock
-    private
-    RecipeService recipeService;
+    private RecipeService recipeService;
+    @Mock
+    private IngredientService ingredientService;
+
     private IngredientController controller;
 
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        controller = new IngredientController(recipeService);
+        controller = new IngredientController(recipeService, ingredientService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -48,9 +52,10 @@ public class IngredientControllerTest {
 
     @Test
     public void testShowIngredientList() throws Exception {
-        RecipeCommand recipeCommand = new RecipeCommand();
 
-        when(recipeService.findCommandById(anyLong())).thenReturn(recipeCommand);
+        IngredientCommand ingredientCommand = new IngredientCommand();
+        when(ingredientService.findByRecipeIdAndIngredientId(anyLong(), anyLong())).thenReturn(ingredientCommand);
+
 
         mockMvc.perform(get("/recipe/1/ingredients/2/show"))
                 .andExpect(status().isOk())
